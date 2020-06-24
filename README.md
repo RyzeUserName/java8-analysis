@@ -38,6 +38,12 @@ strList.stream().filter(Objects::nonNull).map(Integer::valueOf).forEach(System.o
 
 ![image-20200624182735540](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200624182735540.png)
 
+![image-20200624183933679](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200624183933679.png)
+
 ### 4.forEach
 
-根据中间状态存储的要求，其区分 “有界”（例如：limit）、“无界”（例如：sorted）
+![image-20200624183609870](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200624183609870.png)
+
+综上：我们看到一个stream 的流水线 包含 head+ n * StatelessOp /  n * StatefulOp +  evaluate
+
+下面我们详细查看
