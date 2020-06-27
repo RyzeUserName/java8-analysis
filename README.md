@@ -22,9 +22,7 @@ strList.stream().filter(Objects::nonNull).map(Integer::valueOf).forEach(System.o
 
 ![image-20200624181806962](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200624181806962.png)
 
-​						最终返回的对象是 ReferencePipeline.Head，查看下其实现是这样的：
-
-![image-20200624182220973](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200624182220973.png)
+​						最终返回的对象是 ReferencePipeline.Head
 
 ### 2.filter
 
@@ -44,6 +42,40 @@ strList.stream().filter(Objects::nonNull).map(Integer::valueOf).forEach(System.o
 
 ![image-20200624183609870](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200624183609870.png)
 
-综上：我们看到一个stream 的流水线 包含 head+ n * StatelessOp /  n * StatefulOp +  evaluate
+综上：我们看到一个stream 的流水线 包含 head+ n * StatelessOp /  n * StatefulOp... +  evaluate
 
-下面我们详细查看
+下面我们详细查看 ReferencePipeline 详细结构是这样的
+
+![image-20200624182220973](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200624182220973.png)
+
+​						看其实内部就是个一个双端链表
+
+![image-20200627153115540](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627153115540.png)
+
+​							是怎么组装起来的？在哪里组装的？
+
+​							其实也就在  evaluate 方法里，打开实现：
+
+​							![image-20200627162137802](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627162137802.png)
+
+​							接着往下看
+
+​							![image-20200627163046339](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627163046339.png)
+
+​							查看 wrapSink方法：
+
+![image-20200627163248255](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627163248255.png)
+
+​						也就是从foreach 往前遍历，opWrapSink 方法顾名思义  包装成Sink，AbstractPipeline # opWrapSink 其实我们在前面都看过，每个阶段操作
+
+​				都要实现了 opWrapSink返回 Sink
+
+​						![image-20200627214439966](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627214439966.png)
+
+​						几乎都是返回Sink.ChainedReference（ChainedDouble,ChainedInt,ChainedLong）
+
+​						
+
+​					回看之前的代码，返回 
+
+ 
