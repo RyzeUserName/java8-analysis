@@ -54,7 +54,9 @@ strList.stream().filter(Objects::nonNull).map(Integer::valueOf).forEach(System.o
 
 ​							是怎么组装起来的？在哪里组装的？
 
-​							其实也就在  evaluate 方法里，打开实现：
+​							![image-20200629200911086](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200629200911086.png)
+
+​							也就是消费流操作前返回的Stream是个双端链表，那么在  evaluate 方法里，做了什么操作呢？
 
 ​							![image-20200627162137802](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627162137802.png)
 
@@ -62,20 +64,20 @@ strList.stream().filter(Objects::nonNull).map(Integer::valueOf).forEach(System.o
 
 ​							![image-20200627163046339](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627163046339.png)
 
-​							查看 wrapSink方法：
+​							查看里面的 wrapSink方法：
 
 ![image-20200627163248255](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627163248255.png)
 
-​						也就是从foreach 往前遍历，opWrapSink 方法顾名思义  包装成Sink，AbstractPipeline # opWrapSink 其实我们在前面都看过，每个阶段操作
+​						也就是从foreach 之前的中间操作操作往前遍历，opWrapSink 方法顾名思义  包装成Sink，从这个双端链表末尾往前遍历，回看之前的代码
 
-​				都要实现了 opWrapSink返回 Sink
+​						每个中间操作都覆盖了opWrapSink 方法返回	Sink.ChainedReference  
 
-​						![image-20200627214439966](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200627214439966.png)
+​						![image-20200629205312263](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200629205312263.png)
 
-​						几乎都是返回Sink.ChainedReference（ChainedDouble,ChainedInt,ChainedLong）
+​						也就是将一个双端链表 ReferencePipeline 变成一个责任链 Sink.ChainedReference  ,为什么包装成sink？其实就是为了把各种中间操作包装成相同						的无差异的操作，Sink的方法，begin accept end   cancellationRequested( 是否不再接受数据)
 
-​						
+​						往回看AbstractPipeline # copyInto  
 
-​					回看之前的代码，返回 
+​						![image-20200629212348900](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200629212348900.png)
 
- 
+​					责任链调用
