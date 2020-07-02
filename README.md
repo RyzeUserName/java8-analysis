@@ -74,10 +74,18 @@ strList.stream().filter(Objects::nonNull).map(Integer::valueOf).forEach(System.o
 
 ​						![image-20200629205312263](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200629205312263.png)
 
+​						就是短路操作的要实现的方法：cancellationRequested()							
+
 ​						也就是将一个双端链表 ReferencePipeline 变成一个责任链 Sink.ChainedReference  ,为什么包装成sink？其实就是为了把各种中间操作包装成相同						的无差异的操作，Sink的方法，begin accept end   cancellationRequested( 是否不再接受数据)
 
 ​						往回看AbstractPipeline # copyInto  
 
 ​						![image-20200629212348900](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200629212348900.png)
 
-​					责任链调用
+​							注：短路操作  anyMatch() allMatch() noneMatch() findFirst() findAny()  ，短路操作是指不用处理全部元素就可以返回结果
+
+### 						5.并行
+
+​						![image-20200702202037232](https://raw.githubusercontent.com/RyzeUserName/image-upload/master/img/image-20200702202037232.png)
+
+​						其实都是创建了 ForkJoinTask  源自框架    ForkJoinPool
